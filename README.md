@@ -40,7 +40,7 @@ $ cargo run -- --list-stores
 fpki                    1 anchors, with CA store U.S. Federal PKI (Common Policy CA G2)
 webpki_root_certs     118 anchors, anchors only  Web PKI (Mozilla roots, TLS servers, via webpki-root-certs)
 
-$ cargo run -- --store fpki --settings settings/offline.json --target DOD_ID_CA-62.der
+$ cargo run -- --store fpki --settings settings/offline.json --target examples/DOD_ID_CA-62.der
 settings: settings/offline.json
 path 0: Valid
     anchor       CN=Federal Common Policy CA G2,OU=FPKI,O=U.S. Government,C=US
@@ -52,8 +52,8 @@ path 0: Valid
 
 The command above shows successful validation given only a target for a certification path that
 features five certificates, crosses the Federal Bridge from the federal PKI into the DoD PKI, and
-requires no network. The target is a DoD issuing CA, published in the `certval-stores` repository as
-`certval_stores_nipr/cas/prod/DOD_ID_CA-62.der`; a certificate it issues to a person chains the
+requires no network. The target is a DoD issuing CA, included here as `examples/DOD_ID_CA-62.der` and published in the
+`certval-stores` repository as `certval_stores_nipr/cas/prod/DOD_ID_CA-62.der`; a certificate it issues to a person chains the
 same way, just one step further down. The store crate includes the trust anchor, the cross-certified 
 mesh beneath it, and the partial paths among those certificates, so the builder assembles the path 
 from data already linked into the binary. Additionally, `certval` is capable of dynamic path building, 
@@ -104,7 +104,7 @@ relative to times in the past, as occurs when verifying timestamped code signer 
 `--settings` is optional, and leaving it off is not the same as leaving the network alone:
 
 ```
-$ cargo run -- --store fpki --target DOD_ID_CA-62.der
+$ cargo run -- --store fpki --target examples/DOD_ID_CA-62.der
 settings: certval defaults (revocation checked over the network)
 ERROR certval::revocation::crl] Failed to save CRL with: NotFound
 path 0: Valid
@@ -149,7 +149,7 @@ That turns a typo into a silently different policy, so this tool checks the name
 status 1 if an indicated file cannot be found.
 
 ```
-$ cargo run -- --store fpki --settings /nope/typo.json --target DOD_ID_CA-62.der
+$ cargo run -- --store fpki --settings /nope/typo.json --target examples/DOD_ID_CA-62.der
 settings file not found: /nope/typo.json
 ```
 
