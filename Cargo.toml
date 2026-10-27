@@ -2,6 +2,7 @@
 name = "certval-verify"
 version = "0.1.0"
 edition = "2021"
+rust-version = "1.88"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/carl-wallace/certval-verify"
 description = "Validate a certificate with certval against a trust store the binary contains"
