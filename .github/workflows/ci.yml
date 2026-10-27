@@ -1,0 +1,61 @@
+name: certval-verify
+
+on:
+  pull_request:
+  push:
+    branches: main
+  # Manual runs via `gh workflow run ci.yml --ref <branch>`, available once this file is on main.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_INCREMENTAL: 0
+  RUSTFLAGS: "-Dwarnings"
+
+jobs:
+  # Lints run on stable only. The pre-commit hook in each clone runs the same commands so they fail
+  # before a push -- an early warning, not a replacement.
+  fmt:
+    name: rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with: { components: rustfmt }
+      - run: cargo fmt --all --check
+
+  # One shape: the crate has no features, so default and --all-features are the same build.
+  clippy:
+    name: clippy (-D warnings)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with: { components: clippy }
+      - run: cargo clippy --all-targets --locked -- -D warnings
+
+  # The floor a consumer meets: certval's own 1.88, which this crate declares.
+  build-msrv:
+    name: build (MSRV)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.88.0
+      - run: cargo build --locked
+
+  # There are no tests, so the binary is run instead: the stores it carries, and the README's
+  # offline example, which builds a five-certificate path from data linked into the binary and
+  # touches no network. DOD_ID_CA-62 expires 2027-06-02; replace the example before then.
+  run:
+    name: run the README example
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo build --locked
+      - run: ./target/debug/certval-verify --list-stores
+      - run: ./target/debug/certval-verify --settings settings/offline.json --target examples/DOD_ID_CA-62.der
