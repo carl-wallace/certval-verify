@@ -1,0 +1,6 @@
+{
+  "psCheckRevocationStatus": { "Bool": false },
+  "psRetrieveFromAiaSiaHttp": { "Bool": false },
+  "psRequireTaStore": { "Bool": true },
+  "psTimeOfInterest": { "TimeOfInterest": 1640995200 }
+}

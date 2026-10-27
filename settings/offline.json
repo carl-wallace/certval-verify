@@ -1,0 +1,5 @@
+{
+  "psCheckRevocationStatus": { "Bool": false },
+  "psRetrieveFromAiaSiaHttp": { "Bool": false },
+  "psRequireTaStore": { "Bool": true }
+}

@@ -1,0 +1,8 @@
+{
+  "psCheckRevocationStatus": { "Bool": true },
+  "psCheckOcspFromAia": { "Bool": true },
+  "psCheckCrls": { "Bool": true },
+  "psCheckCrlDpHttp": { "Bool": true },
+  "psRetrieveFromAiaSiaHttp": { "Bool": true },
+  "psRequireTaStore": { "Bool": true }
+}
