@@ -2,8 +2,9 @@
 #
 # lockfile-only: CI tests current dependencies without raising the minimum versions in Cargo.toml.
 # The git dependencies are ignored -- certval and the store crates follow their repositories' main
-# branches, and cms and x509-ocsp come from RustCrypto/formats through [patch.crates-io]. They move
-# with `cargo update` when certval or the stores do, not on dependabot's schedule.
+# branches -- and so is cms, a release-candidate line certval tracks, where one candidate can break
+# what built against the last. They move with `cargo update` when certval or the stores do, not on
+# dependabot's schedule.
 version: 2
 updates:
   - package-ecosystem: cargo
@@ -16,7 +17,6 @@ updates:
       - dependency-name: "certval"
       - dependency-name: "certval_stores_*"
       - dependency-name: "cms"
-      - dependency-name: "x509-ocsp"
     groups:
       cargo:
         patterns:
