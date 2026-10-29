@@ -13,7 +13,7 @@ description = "Validate a certificate with certval against a trust store the bin
 
 [dependencies]
 # Until certval publishes, the library and the store crates come from git. Once it is on crates.io
-# these become version requirements and the [patch] table below goes away.
+# these become version requirements.
 certval = { git = "https://github.com/carl-wallace/rust-pki.git", branch = "main", features = [
     "remote",
     "rsa",
@@ -27,9 +27,3 @@ der = "0.8"
 env_logger = "0.11"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 x509-cert = "0.3"
-
-# certval tracks the 0.3-pre line of the RustCrypto formats crates, which pins cms, x509-cert and
-# x509-ocsp together and has no crates.io release. Any binary linking certval repeats these.
-[patch.crates-io]
-cms = { git = "https://github.com/RustCrypto/formats.git" }
-x509-ocsp = { git = "https://github.com/RustCrypto/formats.git" }
