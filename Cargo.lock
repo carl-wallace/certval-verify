@@ -174,7 +174,7 @@ dependencies = [
 [[package]]
 name = "certval"
 version = "0.2.0-rc.1"
-source = "git+https://github.com/carl-wallace/rust-pki.git?branch=main#f98a97594a3a7d53901c628520d4820812eae976"
+source = "git+https://github.com/carl-wallace/rust-pki.git?branch=main#8e0e084cf21924a5e6076f63048cbda10f467e2f"
 dependencies = [
  "base64ct",
  "bitvec",
@@ -187,7 +187,6 @@ dependencies = [
  "ecdsa",
  "flagset",
  "getrandom 0.4.3",
- "hex-literal",
  "log",
  "p256",
  "p384",
@@ -230,7 +229,7 @@ dependencies = [
 [[package]]
 name = "certval_stores_core"
 version = "0.1.0-rc.1"
-source = "git+https://github.com/carl-wallace/certval-stores.git?branch=main#8fabc9d765e13c1581d59a10fbec8f710dcd43df"
+source = "git+https://github.com/carl-wallace/certval-stores.git?branch=main#7600203dd6742e21148b495fd64ebd44b17f045d"
 dependencies = [
  "certval",
  "certval_stores_provider_core",
@@ -241,7 +240,7 @@ dependencies = [
 [[package]]
 name = "certval_stores_fpki"
 version = "1.0.0-rc.1"
-source = "git+https://github.com/carl-wallace/certval-stores.git?branch=main#8fabc9d765e13c1581d59a10fbec8f710dcd43df"
+source = "git+https://github.com/carl-wallace/certval-stores.git?branch=main#7600203dd6742e21148b495fd64ebd44b17f045d"
 dependencies = [
  "certval_stores_provider_core",
 ]
@@ -249,12 +248,12 @@ dependencies = [
 [[package]]
 name = "certval_stores_provider_core"
 version = "1.0.0-rc.1"
-source = "git+https://github.com/carl-wallace/certval-stores.git?branch=main#8fabc9d765e13c1581d59a10fbec8f710dcd43df"
+source = "git+https://github.com/carl-wallace/certval-stores.git?branch=main#7600203dd6742e21148b495fd64ebd44b17f045d"
 
 [[package]]
 name = "certval_stores_webpki_root_certs"
 version = "1.0.0-rc.1"
-source = "git+https://github.com/carl-wallace/certval-stores.git?branch=main#8fabc9d765e13c1581d59a10fbec8f710dcd43df"
+source = "git+https://github.com/carl-wallace/certval-stores.git?branch=main#7600203dd6742e21148b495fd64ebd44b17f045d"
 dependencies = [
  "certval_stores_provider_core",
  "webpki-root-certs",
@@ -840,12 +839,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 
 [[package]]
-name = "hex-literal"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e712f64ec3850b98572bffac52e2c6f282b29fe6c5fa6d42334b30be438d95c1"
-
-[[package]]
 name = "hmac"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1376,7 +1369,7 @@ checksum = "f6b464fbc74e149a392436b17d523f769e057cb6877f6a5c4618bc6f11800548"
 [[package]]
 name = "pkiprocmacros"
 version = "0.1.2"
-source = "git+https://github.com/carl-wallace/rust-pki.git?branch=main#f98a97594a3a7d53901c628520d4820812eae976"
+source = "git+https://github.com/carl-wallace/rust-pki.git?branch=main#8e0e084cf21924a5e6076f63048cbda10f467e2f"
 dependencies = [
  "quote",
  "syn 2.0.119",

@@ -134,8 +134,7 @@ async fn validate(args: &Args, target: &str) -> Result<bool> {
     };
     let anchors_only = entry.cert_store_cbor.is_none();
 
-    let mut ta_source = TaSource::new();
-    prepare_certval_environment(&providers(), &mut pe, &mut ta_source, &args.store)?;
+    prepare_certval_environment(&providers(), &mut pe, &args.store)?;
 
     // Certificates named on the command line, for a store that ships anchors alone or a path that
     // runs through an intermediate the store predates.
