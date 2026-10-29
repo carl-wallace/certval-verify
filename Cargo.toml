@@ -1,6 +1,9 @@
 [package]
 name = "certval-verify"
 version = "0.1.0"
+# A sample to read and build from source, so its trust material is as current as the store crates it
+# builds against; not published.
+publish = false
 edition = "2021"
 rust-version = "1.88"
 license = "Apache-2.0 OR MIT"
