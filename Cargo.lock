@@ -174,7 +174,8 @@ dependencies = [
 [[package]]
 name = "certval"
 version = "0.2.0-rc.1"
-source = "git+https://github.com/carl-wallace/rust-pki.git?branch=main#8e0e084cf21924a5e6076f63048cbda10f467e2f"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc6f0bddbf3de03eac84e36737d40f788805a49472d25c00f1e2c0b784757995"
 dependencies = [
  "base64ct",
  "bitvec",
@@ -229,7 +230,8 @@ dependencies = [
 [[package]]
 name = "certval_stores_core"
 version = "0.1.0-rc.1"
-source = "git+https://github.com/carl-wallace/certval-stores.git?branch=main#7600203dd6742e21148b495fd64ebd44b17f045d"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "44fecf43bb98f7aae251dae5fb5759cd9fb4fd00d2c8ee6015b1644d90f0849c"
 dependencies = [
  "certval",
  "certval_stores_provider_core",
@@ -240,7 +242,8 @@ dependencies = [
 [[package]]
 name = "certval_stores_fpki"
 version = "1.0.0-rc.1"
-source = "git+https://github.com/carl-wallace/certval-stores.git?branch=main#7600203dd6742e21148b495fd64ebd44b17f045d"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b707fc7c2f7a4942333532044c90de4ab019b828a5541595851b3c53cbac5f95"
 dependencies = [
  "certval_stores_provider_core",
 ]
@@ -248,12 +251,14 @@ dependencies = [
 [[package]]
 name = "certval_stores_provider_core"
 version = "1.0.0-rc.1"
-source = "git+https://github.com/carl-wallace/certval-stores.git?branch=main#7600203dd6742e21148b495fd64ebd44b17f045d"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "46fa7b54ececc332fd705fb5f5f9e4424ab140c8fe6970f979ca03be677f5b28"
 
 [[package]]
 name = "certval_stores_webpki_root_certs"
 version = "1.0.0-rc.1"
-source = "git+https://github.com/carl-wallace/certval-stores.git?branch=main#7600203dd6742e21148b495fd64ebd44b17f045d"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "80d7d3ea459aebfae3565e2799e712e780dbdbb635b92eba9bb96e78852aaf3c"
 dependencies = [
  "certval_stores_provider_core",
  "webpki-root-certs",
@@ -1369,7 +1374,8 @@ checksum = "f6b464fbc74e149a392436b17d523f769e057cb6877f6a5c4618bc6f11800548"
 [[package]]
 name = "pkiprocmacros"
 version = "0.1.2"
-source = "git+https://github.com/carl-wallace/rust-pki.git?branch=main#8e0e084cf21924a5e6076f63048cbda10f467e2f"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d5df93c69801978b114a3e8f84e395bc72cee6666b26794adc799cfa4d95fc07"
 dependencies = [
  "quote",
  "syn 2.0.119",
