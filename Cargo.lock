@@ -241,9 +241,9 @@ dependencies = [
 
 [[package]]
 name = "certval_stores_fpki"
-version = "1.0.0-rc.1"
+version = "1.0.0-rc.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b707fc7c2f7a4942333532044c90de4ab019b828a5541595851b3c53cbac5f95"
+checksum = "30cbc2fb99b7131647f8f62a12cdf6b0f45c3b7a7d414e63f816dd342142f5c8"
 dependencies = [
  "certval_stores_provider_core",
 ]
