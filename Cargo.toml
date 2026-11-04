@@ -5,7 +5,7 @@ version = "0.1.0"
 # builds against; not published.
 publish = false
 edition = "2021"
-rust-version = "1.88"
+rust-version = "1.89"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/carl-wallace/certval-verify"
 description = "Validate a certificate with certval against a trust store the binary contains"
