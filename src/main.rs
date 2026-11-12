@@ -1,20 +1,24 @@
-//! Validate a certificate with certval against a trust store the binary contains.
+//! Validate a certificate with certval against a trust store the binary contains, or verify a CMS
+//! SignedData with certval-cms and validate its signers the same way.
 //!
-//! The three inputs are the target certificate, a store id naming which linked community's trust
-//! anchors and CA certificates to use, and a JSON settings file holding the policy the path is
-//! judged under. Everything else -- which anchors exist, which intermediates are available, how
-//! they chain -- comes out of the store crates at link time.
+//! The three inputs are the target certificate (or the signed message), a store id naming which
+//! linked community's trust anchors and CA certificates to use, and a JSON settings file holding
+//! the policy the path is judged under. Everything else -- which anchors exist, which
+//! intermediates are available, how they chain -- comes out of the store crates at link time.
 
 use std::error::Error;
 use std::path::Path;
 use std::process::ExitCode;
+use std::sync::Arc;
 
 use clap::Parser;
 use der::{Decode, DecodePem, Encode};
 use x509_cert::certificate::{CertificateInner, Raw};
 
 use certval::*;
+use certval_cms::{CmsEnvironment, SignerPolicy, Vetting};
 use certval_stores_core::{prepare_certval_environment, TrustStoreProvider};
+use cms::content_info::ContentInfo;
 
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
@@ -35,8 +39,17 @@ fn providers() -> Vec<&'static dyn TrustStoreProvider> {
 )]
 struct Args {
     /// Certificate to validate, DER or PEM
-    #[arg(short, long)]
+    #[arg(short, long, conflicts_with = "signed")]
     target: Option<String>,
+
+    /// CMS SignedData to verify, DER or PEM; each signer's certificate is validated as --target
+    /// would be
+    #[arg(long)]
+    signed: Option<String>,
+
+    /// The content of a detached --signed message
+    #[arg(long, requires = "signed")]
+    content: Option<String>,
 
     /// Store id to validate against; see --list-stores
     #[arg(short, long, default_value = certval_stores_fpki::FPKI)]
@@ -78,12 +91,15 @@ async fn main() -> ExitCode {
         return ExitCode::SUCCESS;
     }
 
-    let Some(target) = args.target.clone() else {
-        eprintln!("--target is required unless --list-stores is given");
-        return ExitCode::FAILURE;
+    let result = match (&args.target, &args.signed) {
+        (Some(target), None) => validate(&args, target).await,
+        (None, Some(signed)) => verify_signed(&args, signed),
+        _ => {
+            eprintln!("--target or --signed is required unless --list-stores is given");
+            return ExitCode::FAILURE;
+        }
     };
-
-    match validate(&args, &target).await {
+    match result {
         Ok(true) => ExitCode::SUCCESS,
         Ok(false) => ExitCode::FAILURE,
         Err(e) => {
@@ -93,8 +109,8 @@ async fn main() -> ExitCode {
     }
 }
 
-/// Returns whether at least one path from the target to an anchor in the named store validated.
-async fn validate(args: &Args, target: &str) -> Result<bool> {
+/// Reads the settings file, saying which policy the run is judged under.
+fn settings(args: &Args) -> Result<CertificationPathSettings> {
     // The settings file is the policy input in full: the time of interest the path is judged at,
     // the initial policy set, whether revocation status is checked and how, name-constraint and
     // key-usage handling.
@@ -111,9 +127,12 @@ async fn validate(args: &Args, target: &str) -> Result<bool> {
             println!("settings: certval defaults (revocation checked over the network)")
         }
     }
-    let cps = read_settings(&args.settings)?;
-    let toi = cps.get_time_of_interest();
+    Ok(read_settings(&args.settings)?)
+}
 
+/// The PkiEnvironment for the named store: its anchors and CA store from the linked provider
+/// crates, plus any --chain certificates. Also returns whether the store carries anchors alone.
+fn environment(args: &Args, cps: &CertificationPathSettings) -> Result<(PkiEnvironment, bool)> {
     let mut pe = PkiEnvironment::default();
     pe.populate_5280_pki_environment();
 
@@ -146,10 +165,19 @@ async fn validate(args: &Args, target: &str) -> Result<bool> {
                 bytes: read_cert(filename)?,
             });
         }
-        cert_source.initialize(&cps)?;
-        cert_source.find_all_partial_paths(&pe, &cps);
+        cert_source.initialize(cps)?;
+        cert_source.find_all_partial_paths(&pe, cps);
         pe.add_certificate_source(Box::new(cert_source));
     }
+
+    Ok((pe, anchors_only))
+}
+
+/// Returns whether at least one path from the target to an anchor in the named store validated.
+async fn validate(args: &Args, target: &str) -> Result<bool> {
+    let cps = settings(args)?;
+    let toi = cps.get_time_of_interest();
+    let (pe, anchors_only) = environment(args, &cps)?;
 
     let mut target_cert = PDVCertificate::try_from(read_cert(target)?.as_slice())?;
     target_cert.parse_extensions(EXTS_OF_INTEREST);
@@ -204,6 +232,55 @@ async fn validate(args: &Args, target: &str) -> Result<bool> {
     Ok(any_valid)
 }
 
+/// Verifies a SignedData's signatures and validates each signer's certificate against the named
+/// store, and returns whether every signer verified.
+///
+/// certval-cms does the CMS side: the message digest and content type attributes, each signature,
+/// and, because settings are passed, a path from each signer's certificate to an anchor, with the
+/// certificate permitting signing. The PkiEnvironment is the one --target uses, shared with the
+/// CmsEnvironment, so the store decides whom the message can be trusted from.
+fn verify_signed(args: &Args, signed: &str) -> Result<bool> {
+    let cps = settings(args)?;
+    let (pe, _) = environment(args, &cps)?;
+    let mut env = CmsEnvironment::new();
+    env.set_pki_environment(Arc::new(pe));
+
+    let content_info = ContentInfo::from_der(&read_der(signed)?)?;
+    let detached = args.content.as_ref().map(std::fs::read).transpose()?;
+
+    let verified = match env.verify_signed_data(
+        &content_info,
+        detached.as_deref(),
+        Some(&cps),
+        SignerPolicy::All,
+    ) {
+        Ok(verified) => verified,
+        Err(e) => {
+            println!("not verified: {e}");
+            return Ok(false);
+        }
+    };
+    println!(
+        "verified: {} octets of content, type {}",
+        verified.content.len(),
+        verified.content_type
+    );
+    for (i, signer) in verified.signers.iter().enumerate() {
+        let status = match &signer.vetting {
+            Vetting::Validated(cpr) => cpr
+                .get_validation_status()
+                .map(|s| format!("{s:?}"))
+                .unwrap_or_else(|| String::from("no status")),
+            _ => String::from("not validated"),
+        };
+        println!(
+            "signer {i}: {}\n    path         {status}",
+            name_to_string(signer.certificate.tbs_certificate().subject())
+        );
+    }
+    Ok(true)
+}
+
 /// Prints the path from its anchor down to the target, one subject per line.
 fn print_path(path: &CertificationPath) {
     if let Ok(name) = get_trust_anchor_name(path.trust_anchor.decoded()) {
@@ -219,6 +296,16 @@ fn print_path(path: &CertificationPath) {
         "    target       {}",
         name_to_string(path.target.decoded().tbs_certificate().subject())
     );
+}
+
+/// Reads a file as DER, converting from PEM when that is what the file holds.
+fn read_der(filename: &str) -> Result<Vec<u8>> {
+    let bytes = std::fs::read(filename)?;
+    if bytes.starts_with(b"-----BEGIN") {
+        Ok(der::pem::decode_vec(&bytes)?.1)
+    } else {
+        Ok(bytes)
+    }
 }
 
 /// Reads a certificate file as DER, converting from PEM when that is what the file holds.

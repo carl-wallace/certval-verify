@@ -16,12 +16,19 @@ description = "Validate a certificate with certval against a trust store the bin
 
 [dependencies]
 certval = { version = "0.2.0-rc.3", features = ["remote", "rsa"] }
+certval-cms = "0.1.0-rc.1"
 certval_stores_core = "0.1.0-rc.1"
-certval_stores_fpki = "1.0.0-rc.3"
+certval_stores_fpki = "1.0.0-rc.4"
 certval_stores_webpki_root_certs = "1.0.0-rc.1"
 
 clap = { version = "4", features = ["derive"] }
+# Pinned to the release certval-cms is built against, so the ContentInfo types are the same.
+cms = "=0.3.0-rc.2"
 der = "0.8"
 env_logger = "0.11"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 x509-cert = "0.3"
+
+# REMOVE BEFORE COMMIT: certval-cms is not on crates.io yet.
+[patch.crates-io]
+certval-cms = { git = "https://github.com/carl-wallace/certval-cms.git", branch = "main" }
