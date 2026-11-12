@@ -28,7 +28,3 @@ der = "0.8"
 env_logger = "0.11"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 x509-cert = "0.3"
-
-# REMOVE BEFORE COMMIT: certval-cms is not on crates.io yet.
-[patch.crates-io]
-certval-cms = { git = "https://github.com/carl-wallace/certval-cms.git", branch = "main" }
