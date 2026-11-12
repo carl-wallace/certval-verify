@@ -15,9 +15,9 @@ description = "Validate a certificate with certval against a trust store the bin
 [workspace]
 
 [dependencies]
-certval = { version = "0.2.0-rc.1", features = ["remote", "rsa"] }
+certval = { version = "0.2.0-rc.3", features = ["remote", "rsa"] }
 certval_stores_core = "0.1.0-rc.1"
-certval_stores_fpki = "1.0.0-rc.1"
+certval_stores_fpki = "1.0.0-rc.3"
 certval_stores_webpki_root_certs = "1.0.0-rc.1"
 
 clap = { version = "4", features = ["derive"] }
